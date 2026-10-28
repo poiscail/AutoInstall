@@ -79,16 +79,20 @@ function Get-ProfileNames {
 function Read-SelectionFile([string]$path) {
     if (-not (Test-Path $path)) { return @() }
     $j = Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json
-    if ($j.Sources) {
-        return @(foreach ($src in $j.Sources) { foreach ($p in $src.Packages) {
+    $all = if ($j.Sources) {
+        foreach ($src in $j.Sources) { foreach ($p in $src.Packages) {
             [pscustomobject]@{ Categorie = 'Importés'; Nom = $p.PackageIdentifier; Id = $p.PackageIdentifier; Version = '' }
-        } })
+        } }
+    } else {
+        $list = if ($j.Logiciels) { $j.Logiciels } else { $j }
+        foreach ($e in $list) {
+            if (-not $e.Id) { continue }
+            [pscustomobject]@{ Categorie = $(if ($e.Categorie) { $e.Categorie } else { 'Importés' }); Nom = $(if ($e.Nom) { $e.Nom } else { $e.Id }); Id = $e.Id; Version = "$($e.Version)" }
+        }
     }
-    $list = if ($j.Logiciels) { $j.Logiciels } else { $j }
-    @(foreach ($e in $list) {
-        if (-not $e.Id) { continue }
-        [pscustomobject]@{ Categorie = $(if ($e.Categorie) { $e.Categorie } else { 'Importés' }); Nom = $(if ($e.Nom) { $e.Nom } else { $e.Id }); Id = $e.Id; Version = "$($e.Version)" }
-    })
+    # Un même ID présent deux fois (fichiers fusionnés à la main...) n'est gardé qu'une fois
+    $seen = New-Object 'Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    @($all | Where-Object { $seen.Add($_.Id) })
 }
 
 function Write-SelectionFile([string]$path, $entries) {
@@ -177,7 +181,7 @@ function Get-AvailableUpgrades {
     $map = New-Object 'Collections.Generic.Dictionary[string,string]' ([StringComparer]::OrdinalIgnoreCase)
     $r = Invoke-Winget 'upgrade --source winget --accept-source-agreements --disable-interactivity' -Capture
     foreach ($row in (ConvertFrom-WingetTable $r.Lines)) {
-        if ($row.Cols.Count -ge 4 -and $row.Cols[3]) { $map[$row.Id.TrimEnd([char]0x2026)] = $row.Cols[3] }
+        if ($row.Cols.Count -ge 4 -and $row.Cols[3]) { $map[$row.Id] = $row.Cols[3] }
     }
     , $map
 }
@@ -185,7 +189,9 @@ function Get-AvailableUpgrades {
 # Retrouve une valeur même si winget a tronqué l'ID avec « … »
 function Find-ById($map, [string]$id) {
     if ($map.ContainsKey($id)) { return $map[$id] }
-    foreach ($k in $map.Keys) { if ($k.Length -ge 10 -and $id.StartsWith($k, [StringComparison]::OrdinalIgnoreCase)) { return $map[$k] } }
+    foreach ($k in $map.Keys) {
+        if ($k.Length -ge 10 -and $k.EndsWith([string][char]0x2026) -and $id.StartsWith($k.TrimEnd([char]0x2026), [StringComparison]::OrdinalIgnoreCase)) { return $map[$k] }
+    }
     $null
 }
 

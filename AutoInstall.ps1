@@ -37,7 +37,11 @@ Sans option, la fenêtre s'ouvre.
 Exemple : AutoInstall.ps1 -Profil Jeux -Installer -Silencieux -Redemarrer
 '@
 
-if ($Aide) { Write-Host $CliHelp; exit }
+if ($Aide) {
+    Write-Host $CliHelp
+    if ($Relance) { [void](Read-Host 'Appuie sur Entrée pour fermer') }
+    exit
+}
 
 # --- Relance en administrateur si besoin (en gardant les options) ---
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -67,7 +71,12 @@ if ($CliMode) {
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { Write-Log "winget est introuvable. Mets à jour « App Installer » depuis le Microsoft Store."; exit 1 }
     [void](Get-ProfileNames)
     $source = if ($Fichier) { $Fichier } else { Get-ProfilePath $(if ($Profil) { $Profil } else { $Settings.Profil }) }
-    if (-not (Test-Path $source)) { Write-Log "Sélection introuvable : $source"; exit 1 }
+    if (-not (Test-Path $source)) {
+        if ($Fichier) { Write-Log "Fichier introuvable : $source" }
+        else { Write-Log "Le profil « $([IO.Path]::GetFileNameWithoutExtension($source)) » n'existe pas encore. Ouvre la fenêtre, coche tes logiciels puis enregistre le profil (profils existants : $((Get-ChildItem $ProfileDir -Filter *.json -File | ForEach-Object BaseName) -join ', '))." }
+        if ($Relance -and -not $Silencieux) { [void](Read-Host 'Appuie sur Entrée pour fermer') }
+        exit 1
+    }
     $entries = @(Read-SelectionFile $source)
     Write-Log "Sélection : $source ($($entries.Count) logiciels)"
     $installed = Get-InstalledPackages
@@ -152,6 +161,8 @@ $script:CurrentProfile = 'Principal'
 # --- Fenêtre principale ---
 $form = New-Object Windows.Forms.Form
 $form.Text = 'AutoInstall - réinstalle tes logiciels en un clic'
+$icoPath = Join-Path $ScriptDir 'AutoInstall.ico'
+if (Test-Path $icoPath) { try { $form.Icon = New-Object Drawing.Icon($icoPath) } catch { } }
 $form.Size = New-Object Drawing.Size(1020, 780)
 $form.MinimumSize = New-Object Drawing.Size(880, 620)
 $form.StartPosition = 'CenterScreen'

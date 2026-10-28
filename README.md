@@ -5,8 +5,10 @@ Réinstalle tous mes logiciels en un clic après une réinstallation de Windows,
 ## Utilisation
 
 1. Télécharger le dépôt (Code → Download ZIP) et l'extraire.
-2. Double-cliquer sur `Lancer.bat` (accepter la demande admin).
+2. Double-cliquer sur `AutoInstall.exe` (ou `Lancer.bat`) et accepter la demande admin.
 3. Cocher ce que tu veux (ou choisir un profil) → **Installer la sélection**.
+
+`AutoInstall.exe` n'est qu'un lanceur : il doit rester à côté de `AutoInstall.ps1`, du dossier `lib` et de `catalogue.json`. Comme il n'est pas signé, Windows SmartScreen ou l'antivirus peuvent afficher un avertissement (« Informations complémentaires » → « Exécuter quand même »). Pour le refabriquer soi-même : `powershell -ExecutionPolicy Bypass -File outils\Compiler-Exe.ps1`.
 
 Si winget n'est pas encore dispo sur un Windows neuf : mettre à jour « App Installer » dans le Microsoft Store.
 
@@ -44,7 +46,9 @@ Options : `-Installer`, `-MettreAJour`, `-ToutMettreAJour`, `-Liste`, `-Profil <
 
 | Fichier / dossier | Rôle |
 |---|---|
+| `AutoInstall.exe` | lanceur (demande les droits admin, lance `AutoInstall.ps1`) |
 | `AutoInstall.ps1` | fenêtre et ligne de commande |
+| `outils\` | sources du lanceur et script pour refabriquer l'exe et l'icône |
 | `lib\Core.ps1` | winget, profils, journal, vérifications |
 | `lib\Outils.ps1` | nettoyage, démarrage, réglages, Gist, clé USB |
 | `catalogue.json` | liste des logiciels proposés (modifiable) |
