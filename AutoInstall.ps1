@@ -22,6 +22,7 @@ $Catalog = @(
     @('Navigateurs',   'Mozilla Firefox',          'Mozilla.Firefox'),
     @('Navigateurs',   'Brave',                    'Brave.Brave'),
     @('Navigateurs',   'Opera GX',                 'Opera.OperaGX'),
+    @('IA',            'Claude',                   'Anthropic.Claude'),
     @('Communication', 'Discord',                  'Discord.Discord'),
     @('Communication', 'Telegram',                 'Telegram.TelegramDesktop'),
     @('Communication', 'Zoom',                     'Zoom.Zoom'),
@@ -34,11 +35,15 @@ $Catalog = @(
     @('Jeux',          'Minecraft Launcher',       'Mojang.MinecraftLauncher'),
     @('Jeux',          'CurseForge',               'Overwolf.CurseForge'),
     @('Jeux',          'Modrinth App',             'Modrinth.ModrinthApp'),
+    @('Jeux',          'Lunar Client',             'Moonsworth.LunarClient'),
+    @('Jeux',          'Rockstar Games Launcher',  'RockstarGames.Launcher'),
+    @('Jeux',          'Roblox',                   'Roblox.Roblox'),
     @('Multimédia',    'VLC',                      'VideoLAN.VLC'),
     @('Multimédia',    'Spotify',                  'Spotify.Spotify'),
     @('Multimédia',    'OBS Studio',               'OBSProject.OBSStudio'),
     @('Multimédia',    'Audacity',                 'Audacity.Audacity'),
     @('Multimédia',    'HandBrake',                'HandBrake.HandBrake'),
+    @('Multimédia',    'FxSound',                  'FxSound.FxSound'),
     @('Utilitaires',   '7-Zip',                    '7zip.7zip'),
     @('Utilitaires',   'WinRAR',                   'RARLab.WinRAR'),
     @('Utilitaires',   'Notepad++',                'Notepad++.Notepad++'),
@@ -51,6 +56,8 @@ $Catalog = @(
     @('Utilitaires',   'TeamViewer',               'TeamViewer.TeamViewer'),
     @('Utilitaires',   'Malwarebytes',             'Malwarebytes.Malwarebytes'),
     @('Utilitaires',   'Google Drive',             'Google.GoogleDrive'),
+    @('Utilitaires',   'WizTree (espace disque)',  'AntibodySoftware.WizTree'),
+    @('Utilitaires',   'TranslucentTB',            'CharlesMilette.TranslucentTB'),
     @('Matériel',      'CPU-Z',                    'CPUID.CPU-Z'),
     @('Matériel',      'GPU-Z',                    'TechPowerUp.GPU-Z'),
     @('Matériel',      'HWMonitor',                'CPUID.HWMonitor'),
@@ -62,16 +69,31 @@ $Catalog = @(
     @('Bureautique',   'SumatraPDF',               'SumatraPDF.SumatraPDF'),
     @('Bureautique',   'Notion',                   'Notion.Notion'),
     @('Bureautique',   'Obsidian',                 'Obsidian.Obsidian'),
+    @('Bureautique',   'Microsoft Teams',          'Microsoft.Teams'),
+    @('Bureautique',   'Outlook',                  'Microsoft.Outlook'),
     @('Développement', 'Visual Studio Code',       'Microsoft.VisualStudioCode'),
     @('Développement', 'Git',                      'Git.Git'),
     @('Développement', 'Python 3.13',              'Python.Python.3.13'),
     @('Développement', 'Node.js LTS',              'OpenJS.NodeJS.LTS'),
     @('Développement', 'Windows Terminal',         'Microsoft.WindowsTerminal'),
+    @('Développement', 'GitHub CLI',               'GitHub.cli'),
+    @('Développement', '.NET SDK 8',               'Microsoft.DotNet.SDK.8'),
+    @('Développement', 'Godot Engine',             'GodotEngine.GodotEngine'),
+    @('Développement', 'VirtualBox',               'Oracle.VirtualBox'),
+    @('Développement', 'Docker Sandboxes',         'Docker.sbx'),
     @('Runtimes',      'Java 21 (Temurin JRE)',    'EclipseAdoptium.Temurin.21.JRE'),
     @('Runtimes',      'Visual C++ 2015+ x64',     'Microsoft.VCRedist.2015+.x64'),
     @('Runtimes',      'Visual C++ 2015+ x86',     'Microsoft.VCRedist.2015+.x86'),
     @('Runtimes',      '.NET Desktop Runtime 8',   'Microsoft.DotNet.DesktopRuntime.8'),
-    @('Runtimes',      'DirectX (runtime)',        'Microsoft.DirectX')
+    @('Runtimes',      'DirectX (runtime)',        'Microsoft.DirectX'),
+    @('Runtimes',      'Java 8 (Oracle JRE)',      'Oracle.JavaRuntimeEnvironment'),
+    @('Runtimes',      'Visual C++ 2013 x64',      'Microsoft.VCRedist.2013.x64'),
+    @('Runtimes',      'Visual C++ 2013 x86',      'Microsoft.VCRedist.2013.x86'),
+    @('Runtimes',      'Visual C++ 2012 x64',      'Microsoft.VCRedist.2012.x64'),
+    @('Runtimes',      'Visual C++ 2012 x86',      'Microsoft.VCRedist.2012.x86'),
+    @('Runtimes',      'Visual C++ 2010 x64',      'Microsoft.VCRedist.2010.x64'),
+    @('Runtimes',      'Visual C++ 2010 x86',      'Microsoft.VCRedist.2010.x86'),
+    @('Runtimes',      'NVIDIA PhysX',             'Nvidia.PhysX')
 )
 
 # --- Fenêtre principale ---
@@ -93,9 +115,19 @@ $searchBtn.Text = 'Chercher un autre logiciel'
 $searchBtn.Location = New-Object Drawing.Point(440, 12)
 $searchBtn.Size = New-Object Drawing.Size(200, 28)
 
+# Filtre de la liste
+$filterTitle = New-Object Windows.Forms.Label
+$filterTitle.Text = 'Filtrer :'
+$filterTitle.Location = New-Object Drawing.Point(12, 48)
+$filterTitle.AutoSize = $true
+
+$filterBox = New-Object Windows.Forms.TextBox
+$filterBox.Location = New-Object Drawing.Point(70, 45)
+$filterBox.Size = New-Object Drawing.Size(220, 26)
+
 $filterLabel = New-Object Windows.Forms.Label
 $filterLabel.Text = 'Coche ce que tu veux, puis « Installer ». Ta sélection est sauvegardée automatiquement.'
-$filterLabel.Location = New-Object Drawing.Point(12, 48)
+$filterLabel.Location = New-Object Drawing.Point(300, 48)
 $filterLabel.AutoSize = $true
 $filterLabel.ForeColor = [Drawing.Color]::DimGray
 
@@ -122,14 +154,40 @@ function Get-Group([string]$name) {
     $groups[$name]
 }
 
+# Tous les logiciels, y compris ceux masqués par le filtre (la catégorie est dans .Tag)
+$AllItems = New-Object Collections.Generic.List[Windows.Forms.ListViewItem]
+# IDs winget déjà installés sur ce PC (remplis au démarrage)
+$InstalledIds = New-Object 'Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+
+function Test-Filter([Windows.Forms.ListViewItem]$item) {
+    $f = $filterBox.Text.Trim()
+    (-not $f) -or $item.Text -like "*$f*" -or $item.SubItems[1].Text -like "*$f*" -or $item.Tag -like "*$f*"
+}
+
+function Update-Filter {
+    $list.BeginUpdate()
+    $list.Items.Clear()
+    foreach ($it in $AllItems) {
+        if (Test-Filter $it) {
+            [void]$list.Items.Add($it)
+            $it.Group = Get-Group $it.Tag
+        }
+    }
+    $list.EndUpdate()
+}
+
 function Add-App([string]$cat, [string]$name, [string]$id, [bool]$checked = $false) {
-    foreach ($it in $list.Items) { if ($it.SubItems[1].Text -eq $id) { $it.Checked = $it.Checked -or $checked; return } }
+    foreach ($it in $AllItems) { if ($it.SubItems[1].Text -eq $id) { $it.Checked = $it.Checked -or $checked; return } }
     $item = New-Object Windows.Forms.ListViewItem($name)
     [void]$item.SubItems.Add($id)
-    [void]$item.SubItems.Add('')
-    $item.Group = Get-Group $cat
+    [void]$item.SubItems.Add($(if ($InstalledIds.Contains($id)) { 'Déjà installé' } else { '' }))
+    $item.Tag = $cat
     $item.Checked = $checked
-    [void]$list.Items.Add($item)
+    $AllItems.Add($item)
+    if (Test-Filter $item) {
+        [void]$list.Items.Add($item)
+        $item.Group = Get-Group $cat
+    }
 }
 
 foreach ($c in $Catalog) { Add-App $c[0] $c[1] $c[2] }
@@ -171,7 +229,7 @@ $btnInstall.ForeColor = [Drawing.Color]::White
 $btnInstall.FlatStyle = 'Flat'
 $btnInstall.Font = New-Object Drawing.Font('Segoe UI', 10, [Drawing.FontStyle]::Bold)
 
-$form.Controls.AddRange(@($searchBox, $searchBtn, $filterLabel, $list, $log, $progress))
+$form.Controls.AddRange(@($searchBox, $searchBtn, $filterTitle, $filterBox, $filterLabel, $list, $log, $progress))
 
 function Write-Log([string]$msg) {
     $log.AppendText("[$(Get-Date -Format HH:mm:ss)] $msg`r`n")
@@ -180,8 +238,9 @@ function Write-Log([string]$msg) {
 
 # --- Sauvegarde / chargement de la sélection ---
 function Save-Selection {
-    $sel = foreach ($it in $list.CheckedItems) {
-        [pscustomobject]@{ Categorie = $it.Group.Header; Nom = $it.Text; Id = $it.SubItems[1].Text }
+    $sel = foreach ($it in $AllItems) {
+        if (-not $it.Checked) { continue }
+        [pscustomobject]@{ Categorie = $it.Tag; Nom = $it.Text; Id = $it.SubItems[1].Text }
     }
     ConvertTo-Json @($sel) | Set-Content -Path $ProfilePath -Encoding UTF8
 }
@@ -211,8 +270,32 @@ function Invoke-Winget([string]$arguments) {
 }
 
 function Set-Busy([bool]$busy) {
-    foreach ($b in @($btnInstall, $btnUpgrade, $btnAll, $btnNone, $btnSave, $searchBtn)) { $b.Enabled = -not $busy }
+    foreach ($b in @($btnInstall, $btnUpgrade, $btnAll, $btnNone, $btnSave, $searchBtn, $filterBox)) { $b.Enabled = -not $busy }
     $list.Enabled = -not $busy
+}
+
+# --- Repère les logiciels déjà installés (winget export donne des IDs exacts) ---
+function Update-InstalledStatus {
+    Set-Busy $true
+    $progress.Style = 'Marquee'
+    Write-Log 'Recherche des logiciels déjà installés...'
+    $tmp = Join-Path $env:TEMP "autoinstall-export-$PID.json"
+    [void](Invoke-Winget "export -o `"$tmp`" --source winget --accept-source-agreements")
+    $InstalledIds.Clear()
+    if (Test-Path $tmp) {
+        try {
+            $data = Get-Content $tmp -Raw -Encoding UTF8 | ConvertFrom-Json
+            foreach ($src in $data.Sources) { foreach ($p in $src.Packages) { [void]$InstalledIds.Add($p.PackageIdentifier) } }
+        } catch { Write-Log "Impossible de lire la liste des logiciels installés : $_" }
+        Remove-Item $tmp -ErrorAction SilentlyContinue
+    }
+    $n = 0
+    foreach ($it in $AllItems) {
+        if ($InstalledIds.Contains($it.SubItems[1].Text)) { $it.SubItems[2].Text = 'Déjà installé'; $n++ }
+    }
+    Write-Log "$n logiciel(s) de la liste déjà installé(s) sur ce PC."
+    $progress.Style = 'Blocks'
+    Set-Busy $false
 }
 
 # --- Recherche dans tout le catalogue winget ---
@@ -274,6 +357,7 @@ $searchAction = {
 }
 $searchBtn.Add_Click($searchAction)
 $searchBox.Add_KeyDown({ if ($_.KeyCode -eq 'Enter') { $_.SuppressKeyPress = $true; & $searchAction } })
+$filterBox.Add_TextChanged({ Update-Filter })
 
 # --- Boutons ---
 $btnAll.Add_Click({ foreach ($it in $list.Items) { $it.Checked = $true } })
@@ -291,8 +375,9 @@ $btnUpgrade.Add_Click({
 })
 
 $btnInstall.Add_Click({
-    $items = @($list.CheckedItems)
+    $items = @($AllItems | Where-Object { $_.Checked })
     if ($items.Count -eq 0) { Write-Log 'Rien de coché.'; return }
+    $filterBox.Text = ''   # tout réafficher pour suivre la progression
     Save-Selection
     Set-Busy $true
     $progress.Style = 'Blocks'
@@ -332,6 +417,7 @@ $form.Add_Shown({
         return
     }
     Load-Selection
+    Update-InstalledStatus
     Write-Log 'Prêt. winget installera toujours la dernière version disponible.'
 })
 
